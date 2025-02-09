@@ -118,7 +118,7 @@
             const formattedEndDate = formatDate(endDate);
             const dateRange = `${formattedStartDate},${formattedEndDate}`;
 
-            let url = `http://192.168.0.196:3000/${apiEndpoint}?date=${dateRange}`;
+            let url = `https://stocks-screener-bice.vercel.app/${apiEndpoint}?date=${dateRange}`;
             if (value) url += `&value=${value}`;
             if (order) url += `&order=${order}`;
             if (filter) url += `&filter=${filter}`;
