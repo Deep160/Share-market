@@ -64,41 +64,65 @@
         <h2>NSE Data Viewer</h2>
         <label for="apiEndpoint">Select API:</label>
         <select id="apiEndpoint">
-            <option value="nse-bhavcopy">NSE Bhavcopy</option>
-            <option value="top-gainer-daily">Top Gainer Daily</option>
-            <option value="sector-daily">Sector Daily</option>
+            <option value="nse-bhavcopy">DeliveryBreakout(0,1,2)</option>
+            <option value="top-gainer-daily">Stock Breakout(Gainer-Looser)</option>
+            <option value="sector-daily">Sector Breakout(Gainer-Looser)</option>
         </select>
-        <label for="date">Enter Date(s) (DD-MMM-YYYY, comma-separated):</label>
-        <input type="text" id="date" placeholder="e.g., 04-Feb-2025,05-Feb-2025">
+        
+        <label for="startDate">Previous Date:</label>
+        <input type="date" id="startDate">
+        
+        <label for="endDate">Current Date:</label>
+        <input type="date" id="endDate">
+        
         <label for="value">Enter Value (Optional):</label>
         <input type="number" id="value" placeholder="Number of records to fetch">
+        
         <label for="order">Sort Order:</label>
         <select id="order">
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
+            <option value="desc">Descending(Top Gainer)</option>
+            <option value="asc">Ascending(Top Looser)</option>
         </select>
+        
+        <input type="number" id="filter" placeholder="Investor favourite">
+        
         <button onclick="fetchData()">Fetch Data</button>
+        
         <table id="dataTable">
             <thead></thead>
             <tbody></tbody>
         </table>
     </div>
+    
     <script>
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]}-${date.getFullYear()}`;
+        }
+
         async function fetchData() {
             const apiEndpoint = document.getElementById("apiEndpoint").value;
-            const date = document.getElementById("date").value;
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
             const value = document.getElementById("value").value;
             const order = document.getElementById("order").value;
-            
-            if (!date) {
-                alert("Please enter a valid date.");
+            const filter = document.getElementById("filter").value;
+
+            if (!startDate || !endDate) {
+                alert("Please select both start and end dates.");
                 return;
             }
 
-            let url = `http://localhost:3000/${apiEndpoint}?date=${date}`;
+            const formattedStartDate = formatDate(startDate);
+            const formattedEndDate = formatDate(endDate);
+            const dateRange = `${formattedStartDate},${formattedEndDate}`;
+
+            let url = `http://192.168.0.196:3000/${apiEndpoint}?date=${dateRange}`;
             if (value) url += `&value=${value}`;
             if (order) url += `&order=${order}`;
-            
+            if (filter) url += `&filter=${filter}`;
+
             try {
                 const response = await fetch(url);
                 const data = await response.json();
